@@ -1,0 +1,63 @@
+- name: Install required packages
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - openssl-devel
+    - readline-devel
+    - ncurses-devel
+    - gcc
+    - "@Development Tools"
+    - unzip
+
+- name: Create sources root directory
+  file:
+    path: "{{ vpn_src_root_path }}"
+    state: directory
+
+- name: Download and unpack source archive
+  unarchive:
+    src: "https://github.com/SoftEtherVPN/SoftEtherVPN/archive/v{{ vpn_version }}.zip"
+    dest: "{{ vpn_src_root_path }}"
+    remote_src: true
+    creates: "{{ vpn_src_path }}/configure"
+
+- name: Make binaries
+  shell: ./configure && make
+  args:
+    chdir: "{{ vpn_src_path }}"
+    creates: "{{ vpn_src_path }}/bin/vpnserver/vpnserver"
+
+- name: Install server
+  shell: "cp -R {{ vpn_src_path }}/bin/vpnserver {{ vpn_root }}"
+  args:
+    creates: "{{ vpn_root }}/vpnserver"
+
+- name: Install vpncmd
+  copy:
+    src: "{{ vpn_src_path }}/bin/vpncmd/vpncmd"
+    dest: "{{ vpn_root }}/"
+    mode: 755
+    remote_src: true
+
+- name: Check vpnserver configured
+  stat:
+    path: "{{ vpn_root }}/vpn_server.config"
+  register: vpn_config
+
+- name: Install SystemD service for server
+  copy:
+    src: "{{ vpn_src_path }}/systemd/softether-vpnserver.service"
+    dest: "/etc/systemd/system/vpnserver.service"
+    remote_src: true
+  notify:
+    - reload systemd
+
+- name: Configure vpnserver
+  include: configure.yml
+  when: "{{ not vpn_config.stat.exists }}"
+
+- name: Enable SystemD service on boot
+  service: name=vpnserver state=started enabled=yes
+
+

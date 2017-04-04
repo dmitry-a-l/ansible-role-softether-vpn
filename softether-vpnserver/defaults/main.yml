@@ -1,0 +1,66 @@
+---
+vpn_protocols:
+  - openvpn
+  - softether
+  - l2tp_ipsec
+
+vpn_remote_management: true
+
+vpn_ports:
+  tcp:
+    openvpn:
+      - 443
+    l2tp_ipsec:
+      - 1701
+    softether:
+      - 992
+  udp:
+    openvpn:
+      - 1194
+    l2tp_ipsec:
+      - 500
+      - 4500
+  manage:
+    - 5555
+    - 443
+
+vpn_users:
+  - name: user
+    password: password
+    groups: [users]
+
+vpn_groups: "{{ vpn_users | map(attribute='groups') | sum(start=[]) | unique }}"
+
+vpn_server_password: server_password
+
+vpn_ipsec_preshared_key: vpn_ipsec_preshared_key
+
+vpn_tcp_ports: |
+  {{ (vpn_protocols | intersect(vpn_ports['tcp'].keys())) | map('extract', vpn_ports['tcp']) | list | sum(start=[]) }}
+vpn_udp_ports: |
+  {{ (vpn_protocols | intersect(vpn_ports['udp'].keys())) | map('extract', vpn_ports['udp']) | list | sum(start=[]) }}
+vpn_manage_ports: |
+  {% if vpn_remote_management %}{{ vpn_ports.manage }}{% else %}{{ [] }}{% endif %}
+
+vpn_version: 4.22-9634-beta
+
+vpn_src_root_path: /usr/local/src
+
+vpn_src_path: "{{ vpn_src_root_path }}/SoftEtherVPN-{{ vpn_version }}"
+
+vpn_root: "/opt/vpnserver"
+
+vpn_vpncmd: "{{ vpn_root }}/vpncmd localhost /server /csv"
+
+vpn_hub:
+  name: default
+  ip: 10.10.10.1
+  mask: 255.255.255.0
+  dhcp:
+    start: 10.10.10.200
+    end: 10.10.10.250
+    mask: 255.255.255.0
+    expire: 7200 # seconds
+    gateway: 10.10.10.1
+    dns: 10.10.10.1
+    dns2: none
