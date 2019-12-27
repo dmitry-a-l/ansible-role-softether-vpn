@@ -1,7 +1,5 @@
 ---
 vpn_protocols:
-  - openvpn
-  - softether
   - l2tp_ipsec
 
 vpn_remote_management: true
