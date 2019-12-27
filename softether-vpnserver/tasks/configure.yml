@@ -19,14 +19,6 @@
     - "/cmd ServerCipherSet ECDHE-RSA-AES128-GCM-SHA256"
     # enable SecureNat mode
     - "/hub:{{ vpn_hub.name }} /cmd SecureNatEnable"
-    # configure NAT
-    - "/hub:{{ vpn_hub.name }} /cmd SecureNatHostSet /mac:none /ip:{{ vpn_hub.ip }} /mask:{{ vpn_hub.mask }}"
-    # configure DHCP
-    - >
-      /hub:{{ vpn_hub.name }} /cmd DhcpSet
-      /start:{{ vpn_hub.dhcp.start }} /end:{{ vpn_hub.dhcp.end }} /mask:{{ vpn_hub.dhcp.mask }}
-      /expire:{{ vpn_hub.dhcp.expire }} /gw:{{ vpn_hub.dhcp.gateway }} /dns:{{ vpn_hub.dhcp.dns }}
-      /dns2:{{ vpn_hub.dhcp.dns2 }} /domain:none /log:yes /PushRoute:none
 
 - name: Create groups
   command: "{{ vpn_vpncmd }} /hub:{{ vpn_hub.name }} /cmd GroupCreate {{ item }} /RealName:none /Note:none"

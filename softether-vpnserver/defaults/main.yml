@@ -48,7 +48,7 @@ vpn_src_root_path: /usr/local/src
 
 vpn_src_path: "{{ vpn_src_root_path }}/SoftEtherVPN-{{ vpn_version }}"
 
-vpn_root: "/opt/vpnserver"
+vpn_root: "/usr/local/vpnserver"
 
 vpn_vpncmd: "{{ vpn_root }}/vpncmd localhost /server /csv"
 

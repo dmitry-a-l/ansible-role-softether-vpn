@@ -22,23 +22,11 @@
     remote_src: true
     creates: "{{ vpn_src_path }}/configure"
 
-- name: Make binaries
-  shell: ./configure && make
+- name: Configure, make and install binaries
+  shell: ./configure && make install
   args:
     chdir: "{{ vpn_src_path }}"
-    creates: "{{ vpn_src_path }}/bin/vpnserver/vpnserver"
-
-- name: Install server
-  shell: "cp -R {{ vpn_src_path }}/bin/vpnserver {{ vpn_root }}"
-  args:
     creates: "{{ vpn_root }}/vpnserver"
-
-- name: Install vpncmd
-  copy:
-    src: "{{ vpn_src_path }}/bin/vpncmd/vpncmd"
-    dest: "{{ vpn_root }}/"
-    mode: 755
-    remote_src: true
 
 - name: Check vpnserver configured
   stat:
@@ -50,6 +38,12 @@
     src: "{{ vpn_src_path }}/systemd/softether-vpnserver.service"
     dest: "/etc/systemd/system/vpnserver.service"
     remote_src: true
+
+- name: Set correct binaries path in VpnServer service
+  replace:
+    path: "/etc/systemd/system/vpnserver.service"
+    regexp: "/opt/"
+    replace: "{{ vpn_root }}"
   notify:
     - reload systemd
 
