@@ -44,7 +44,7 @@ vpn_version: 4.34-9745-beta
 
 vpn_src_root_path: /usr/local/src
 
-vpn_src_path: "{{ vpn_src_root_path }}/SoftEtherVPN-{{ vpn_version }}"
+vpn_src_path: "{{ vpn_src_root_path }}/SoftEtherVPN_Stable-{{ vpn_version }}"
 
 vpn_root: "/usr/local/vpnserver"
 
