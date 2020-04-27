@@ -15,7 +15,7 @@
 
 - name: Download and unpack source archive
   unarchive:
-    src: "https://github.com/SoftEtherVPN/SoftEtherVPN/archive/v{{ vpn_version }}.zip"
+    src: "https://github.com/SoftEtherVPN/SoftEtherVPN_Stable/archive/v{{ vpn_version }}.zip"
     dest: "{{ vpn_src_root_path }}"
     remote_src: true
     creates: "{{ vpn_src_path }}/configure"
