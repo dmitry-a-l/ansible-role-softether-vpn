@@ -47,7 +47,7 @@
 
 - name: Configure vpnserver
   include: configure.yml
-  when: "{{ not vpn_config.stat.exists }}"
+  when: not vpn_config.stat.exists
 
 - name: Enable SystemD service on boot
   service: name=vpnserver state=started enabled=yes
