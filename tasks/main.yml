@@ -1,14 +1,12 @@
 - name: Install required packages
   yum:
-    name: "{{ item }}"
-    state: latest
-  with_items:
-    - openssl-devel
-    - readline-devel
-    - ncurses-devel
-    - gcc
-    - "@Development Tools"
-    - unzip
+    name:
+      - openssl-devel
+      - readline-devel
+      - ncurses-devel
+      - gcc
+      - "@Development Tools"
+      - unzip
 
 - name: Create sources root directory
   file:
@@ -53,5 +51,4 @@
 
 - name: Enable SystemD service on boot
   service: name=vpnserver state=started enabled=yes
-
 
