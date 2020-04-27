@@ -40,7 +40,7 @@ vpn_udp_ports: |
 vpn_manage_ports: |
   {% if vpn_remote_management %}{{ vpn_ports.manage }}{% else %}{{ [] }}{% endif %}
 
-vpn_version: 4.22-9634-beta
+vpn_version: 4.34-9745-beta
 
 vpn_src_root_path: /usr/local/src
 
