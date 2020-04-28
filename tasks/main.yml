@@ -26,7 +26,7 @@
     chdir: "{{ vpn_src_path }}"
     creates: "{{ vpn_root }}/vpnserver"
 
-- name: Check vpnserver configured
+- name: Check vpnserver config file
   stat:
     path: "{{ vpn_root }}/vpn_server.config"
   register: vpn_config
@@ -37,18 +37,34 @@
     dest: "/etc/systemd/system/vpnserver.service"
     remote_src: true
 
-- name: Set correct binaries path in VpnServer service
+- name: Correct pathes in the SystemD service file
   replace:
     path: "/etc/systemd/system/vpnserver.service"
-    regexp: "/opt/"
+    regexp: "/opt/vpnserver"
     replace: "{{ vpn_root }}"
-  notify:
-    - reload systemd
+
+- name: Update SystemD service
+  systemd:
+    daemon_reload: yes
 
 - name: Configure vpnserver
   include: configure.yml
-  when: not vpn_config.stat.exists
 
 - name: Enable SystemD service on boot
-  service: name=vpnserver state=started enabled=yes
+  service:
+    name: vpnserver
+    state: started
+    enabled: yes
+
+- name: Open TCP ports
+  shell: "firewall-cmd --zone=public --add-port={{ item }}/tcp --permanent"
+  with_items: "{{ vpn_tcp_ports }}"
+  notify:
+    - restart firewalld
+
+- name: Open UDP ports
+  shell: "firewall-cmd --zone=public --add-port={{ item }}/udp --permanent"
+  with_items: "{{ vpn_udp_ports }}"
+  notify:
+    - restart firewalld
 

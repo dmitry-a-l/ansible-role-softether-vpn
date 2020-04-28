@@ -1,20 +1,13 @@
-- name: Create default config
-  copy:
-    src: opt/vpnserver/vpn_server.config
-    dest: /opt/vpnserver/vpn_server.config
-
 - name: Run server
-  service: name=vpnserver state=started
+  service:
+    name: vpnserver
+    state: started
 
 - name: Configure server
   command: "{{ vpn_vpncmd }} {{ item }}"
   with_items:
     # enable L2TP over IPSec
     - "/cmd IPSecEnable /L2TP:yes /L2TPRaw:no /EtherIP:no /PSK:{{ vpn_ipsec_preshared_key }} /DefaultHub:{{ vpn_hub.name }}"
-    # disable OpenVPN
-    - "/cmd OpenVpnEnable no /ports:1194"
-    # disable Keep Alive feature
-    - "/cmd KeepDisable"
     # use safe cipher for encryption
     - "/cmd ServerCipherSet ECDHE-RSA-AES128-GCM-SHA256"
     # enable SecureNat mode
@@ -28,7 +21,7 @@
   command: "{{ vpn_vpncmd }} /hub:{{ vpn_hub.name }} /cmd UserCreate {{ item.name }} /group:{{ item.groups | first }} /RealName:none /Note:none"
   with_items: "{{ vpn_users }}"
 
-- name: Set user passwords
+- name: Set passwords
   command: "{{ vpn_vpncmd }} /hub:{{ vpn_hub.name }} /cmd UserPasswordSet {{ item.name }} /password:{{ item.password }}"
   with_items: "{{ vpn_users }}"
 
